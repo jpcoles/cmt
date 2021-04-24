@@ -1,0 +1,14 @@
+cmt - Contour Membrane Thickness
+--------------------------------
+
+Dependencies:
+
+    o Python 3
+    o Matplotlib
+    o Numpy 
+
+
+Recommendations:
+
+    Install Anaconda with Python3
+
