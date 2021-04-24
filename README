@@ -12,3 +12,35 @@ Recommendations:
 
     Install Anaconda with Python3
 
+
+
+usage: cmt.py [-h] [-o output-file] [--verbose] [--levels CONTOUR_LEVELS] [--title TITLE] [--mean MEAN] [--vmin VMIN] [--vmax VMAX] [--rows ROWS] [--cols COLS]
+              [--plot-global-average] [--filled | --no-filled] [--smooth-colorbar] [--colormap COLORMAP]
+              dat-file [dat-file ...]
+
+Plot membrane thickness grids as contours.
+
+positional arguments:
+  dat-file              DAT file(s) to plot.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o output-file        Filename for figure. File extension determines file type.
+  --verbose, -v         Set verbose level. Repeated usage increases verbosity.
+  --levels CONTOUR_LEVELS
+                        Set the number of contour levels.
+  --title TITLE         Title for figure.
+  --mean MEAN           A real number, "local", "global", or the mean over another dat file. Remove the given mean from each figure.
+  --vmin VMIN           Set minimum contour value.
+  --vmax VMAX           Set maximum contour value.
+  --rows ROWS           Set maximum number of plot rows.
+  --cols COLS           Set maximum number of plot columns.
+  --plot-global-average
+                        Plot the average contour over all inputs.
+  --filled              Plot filled contours.
+  --no-filled           Plot contours as lines
+  --smooth-colorbar     Use a smoothly varying colorbar.
+  --colormap COLORMAP   Change the colormap to one supported by Matplotlib or CMashing. Use "list" to see all available colormaps.
+
+Written by Jonathan Coles <jonathan.coles@tum.de>
+
