@@ -136,6 +136,8 @@ def main(args):
 
     cmap=cm.get_cmap(args.colormap)
 
+    contour_kwargs = dict(cmap=cmap, extend='both')
+
     #
     # Setup the contouring arguments.
     #
@@ -147,11 +149,10 @@ def main(args):
 
         if args.contour_levels is not None:
             contour_levels = np.linspace(vmin,vmax,args.contour_levels+1)
-            contour_kwargs = dict(levels=contour_levels, cmap=cmap, norm=BoundaryNorm(contour_levels, cmap.N))
-        else:
-            contour_kwargs = dict(cmap=cmap)
+            contour_kwargs['levels'] = contour_levels
+            contour_kwargs['norm'] = BoundaryNorm(contour_levels, cmap.N)
     else:
-        contour_kwargs = dict(levels=0, cmap=cmap)
+        contour_kwargs['levels'] = 0
 
 
     #
@@ -174,10 +175,19 @@ def main(args):
         _ax.set_xlabel('y [A]')
         _ax.set_ylabel('x [A]')
         _ax.set_title(fname)
+
+        cbar_kwargs = dict(cax=cax)
+        if args.vmin and args.vmax:
+            cbar_kwargs['extend'] = 'both'
+        elif args.vmin:
+            cbar_kwargs['extend'] = 'min'
+        elif args.vmax:
+            cbar_kwargs['extend'] = 'max'
+
         if args.smooth_colorbar:
-            cbar = fig.colorbar(im, cax=cax)
+            cbar = fig.colorbar(im, **cbar_kwargs)
         else:
-            cbar = fig.colorbar(cntr, cax=cax)
+            cbar = fig.colorbar(cntr, **cbar_kwargs)
 
         cbar.set_label('Thickness [A]')
 
