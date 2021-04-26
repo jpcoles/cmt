@@ -61,8 +61,8 @@ def main(args):
     #
     gbl_mean = 0
     Ms = []
-    vmin = args.vmin if args.vmin is not None else +np.inf
-    vmax = args.vmax if args.vmax is not None else -np.inf
+    vmin = +np.inf
+    vmax = -np.inf
     for i,fname in enumerate(args.file):
         if not os.path.exists(fname):
             warn(f'{fname} does not exist. Skipping.')
@@ -81,17 +81,21 @@ def main(args):
         if vmax is not None: vmax = max(vmax, np.amax(M['AVG']))
         Ms.append( [fname, M] )
 
+
     #
     # Subtract off the global mean if requested.
     #
     if args.mean == 'global':
         gbl_mean /= len(Ms)
-        vmin = args.vmin if args.vmin is not None else +np.inf
-        vmax = args.vmax if args.vmax is not None else -np.inf
+        vmin = +np.inf
+        vmax = -np.inf
         for [fname,M] in Ms:
             M['AVG'] -= gbl_mean
             if vmin is not None: vmin = min(vmin, np.amin(M['AVG']))
             if vmax is not None: vmax = max(vmax, np.amax(M['AVG']))
+
+    vmin = args.vmin if args.vmin is not None else vmin
+    vmax = args.vmax if args.vmax is not None else vmax
 
     #
     # Plot the global average as the first plot.
@@ -120,8 +124,8 @@ def main(args):
         ncols = args.cols
         nrows = int(np.ceil(nplots / ncols))
     else:
-        nrows = int(np.ceil(np.sqrt(nplots)))
         ncols = int(np.ceil(np.sqrt(nplots)))
+        nrows = int(np.ceil(nplots / ncols))
 
     assert (nrows * ncols >= nplots)
 
@@ -167,16 +171,29 @@ def main(args):
         divider = make_axes_locatable(_ax)
         cax = divider.append_axes('right', size='5%', pad=0.05)
 
-        _ax.set_xlabel('y')
-        _ax.set_ylabel('x')
+        _ax.set_xlabel('y [A]')
+        _ax.set_ylabel('x [A]')
         _ax.set_title(fname)
         if args.smooth_colorbar:
-            fig.colorbar(im, cax=cax)
+            cbar = fig.colorbar(im, cax=cax)
         else:
-            fig.colorbar(cntr, cax=cax)
+            cbar = fig.colorbar(cntr, cax=cax)
+
+        cbar.set_label('Thickness [A]')
+
+    title = []
+
+    if args.date:
+        from datetime import datetime
+        now = datetime.now()
+        date_time = now.strftime("Created on: %m/%d/%Y, %H:%M:%S")
+        title.append(date_time)
 
     if args.title:
-        fig.suptitle(args.title)
+        title.append(args.title)
+
+    if title:
+        fig.suptitle('\n\n'.join(title))
 
     #
     # Display or save the results.
@@ -232,7 +249,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--levels', help='Set the number of contour levels.', type=int, dest='contour_levels', default=None)
     parser.add_argument(
-        '--title',  help='Title for figure.', type=str, default=None)
+        '--title',  help='Title for figure.', type=str, default='')
     parser.add_argument(
         '--mean',   help='A real number, "local", "global", or the mean over another dat file. Remove the given mean from each figure.', default=0)
     parser.add_argument(
@@ -243,13 +260,18 @@ if __name__ == '__main__':
         '--rows',   help='Set maximum number of plot rows.', type=int, default=None)
     parser.add_argument(
         '--cols',   help='Set maximum number of plot columns.', type=int, default=None)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        '--no-date',   help='Do no add the creation date to the title.', action='store_false', dest='date')
+    group.add_argument(
+        '--date',      help='Add the creation date to the title.', action='store_true', dest='date', default=True)
     parser.add_argument(
         '--plot-global-average',    help='Plot the average contour over all inputs.', action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        '--filled',     help='Plot filled contours.', action='store_true', dest='filled')
-    group.add_argument(
         '--no-filled',  help='Plot contours as lines', action='store_false', dest='filled')
+    group.add_argument(
+        '--filled',     help='Plot filled contours.', action='store_true', dest='filled', default=True)
     parser.add_argument(
         '--smooth-colorbar',        help='Use a smoothly varying colorbar.', action='store_true')
     parser.add_argument(
